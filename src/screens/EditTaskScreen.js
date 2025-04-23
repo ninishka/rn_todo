@@ -64,11 +64,9 @@ const EditTaskScreen = ({ route, navigation }) => {
   };
 
   const onDateChange = (event, selectedDate) => {
-    setShowDatePicker(Platform.OS !== 'web');
-  
+    setShowDatePicker(false);
     if (selectedDate) {
-      const utcISOString = new Date(selectedDate).toISOString();
-      setDate(utcISOString);
+      setDate(selectedDate);
     }
   };
 
@@ -178,7 +176,7 @@ const EditTaskScreen = ({ route, navigation }) => {
               <>
                 <TouchableOpacity
                   style={styles.datePickerButton}
-                  onPress={() => setShowDatePicker(true)}
+                  // onPress={() => setShowDatePicker(true)}
                 >
                   <Text style={styles.datePickerText}>{formatDate(date)}</Text>
                   <Ionicons name="calendar-outline" size={20} color="#007AFF" />

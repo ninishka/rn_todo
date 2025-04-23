@@ -39,7 +39,7 @@ const AddTaskScreen = ({ navigation }) => {
   };
 
   const onDateChange = (event, selectedDate) => {
-    setShowDatePicker(Platform.OS !== 'web');
+    setShowDatePicker(false);
     if (selectedDate) {
       setDate(selectedDate);
     }
@@ -65,6 +65,7 @@ const AddTaskScreen = ({ navigation }) => {
       }
     }
   };
+
 
   return (
     <KeyboardAvoidingView
