@@ -65,8 +65,10 @@ const EditTaskScreen = ({ route, navigation }) => {
 
   const onDateChange = (event, selectedDate) => {
     setShowDatePicker(Platform.OS !== 'web');
+  
     if (selectedDate) {
-      setDate(selectedDate);
+      const utcISOString = new Date(selectedDate).toISOString();
+      setDate(utcISOString);
     }
   };
 

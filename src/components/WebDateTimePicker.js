@@ -1,24 +1,30 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 
 const WebDateTimePicker = ({ value, onChange, mode = 'datetime' }) => {
   if (Platform.OS !== 'web') {
     return null;
   }
+  function toLocalISOString(date) {
+    const offsetMs = date.getTimezoneOffset() * 60000;
+    const localISOTime = new Date(date.getTime() - offsetMs).toISOString().slice(0, 16);
+    return localISOTime;
+  }
 
   const handleChange = (e) => {
-    const newDate = new Date(e.target.value);
-    if (!isNaN(newDate)) {
-      onChange({ nativeEvent: { timestamp: newDate.getTime() } }, newDate);
+    const localDate = new Date(e.target.value); // Local time input
+    if (!isNaN(localDate)) {
+      const utcISOString = localDate.toISOString(); 
+      onChange({ nativeEvent: { timestamp: localDate.getTime() } }, utcISOString);
     }
   };
 
   const formatDateForInput = () => {
     if (!value) return '';
-    
+
     const date = new Date(value);
     if (isNaN(date)) return '';
-    
+
     if (mode === 'date') {
       return date.toISOString().split('T')[0];
     } else if (mode === 'time') {
@@ -33,18 +39,17 @@ const WebDateTimePicker = ({ value, onChange, mode = 'datetime' }) => {
 
   return (
     <View style={styles.container}>
-      <TextInput 
+      <input
         style={styles.input}
-        value={formatDateForInput()}
-        onChange={handleChange}
-        inputMode="none"
         type={inputType}
+        value={value ? toLocalISOString(new Date(value)) : ''}
+        onChange={handleChange}
       />
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     width: '100%',
   },
@@ -53,10 +58,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 4,
-    paddingHorizontal: 10,
-    marginVertical: 10,
+    padding: '0 10px',
+    margin: '10px 0',
     backgroundColor: 'white',
+    fontSize: 16,
+    width: '100%',
+    boxSizing: 'border-box',
   },
-});
+};
 
-export default WebDateTimePicker; 
+export default WebDateTimePicker;
