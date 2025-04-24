@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, ScrollView,
-  StyleSheet, KeyboardAvoidingView, Platform, Alert, ActivityIndicator, Button, SafeAreaView
+  StyleSheet, KeyboardAvoidingView, Platform, Alert, ActivityIndicator, SafeAreaView, StatusBar
 } from 'react-native';
-import WebDateTimePicker from '../components/WebDateTimePicker';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { showAlert } from '../utils/webUtils';
+import { useTheme } from '../utils/themeContext';
 
 const TaskFormScreen = ({ mode = 'add', initialTask = null, onSubmit, loading, navigation }) => {
+  const { theme, colors } = useTheme(); 
   const [title, setTitle] = useState(initialTask?.title || '');
   const [description, setDescription] = useState(initialTask?.description || '');
   const [location, setLocation] = useState(initialTask?.location || '');
@@ -35,22 +35,12 @@ const TaskFormScreen = ({ mode = 'add', initialTask = null, onSubmit, loading, n
     const success = await onSubmit(taskPayload);
 
     if (success) {
-      if (Platform.OS === 'web') {
-        showAlert('Success', `Task ${mode === 'edit' ? 'updated' : 'created'} successfully!`, [
-          { text: 'OK', onPress: () => navigation.goBack() },
-        ]);
-      } else {
-        Alert.alert('Success', `Task ${mode === 'edit' ? 'updated' : 'created'} successfully!`, [
-          { text: 'OK', onPress: () => navigation.goBack() },
-        ]);
-      }
+      Alert.alert('Success', `Task ${mode === 'edit' ? 'updated' : 'created'} successfully!`, [
+        { text: 'OK', onPress: () => navigation.goBack() },
+      ]);
     } else {
       const errorMessage = `Failed to ${mode === 'edit' ? 'update' : 'create'} task. Please try again.`;
-      if (Platform.OS === 'web') {
-        showAlert('Error', errorMessage);
-      } else {
-        Alert.alert('Error', errorMessage);
-      }
+      Alert.alert('Error', errorMessage);
     }
   };
 
@@ -59,68 +49,87 @@ const TaskFormScreen = ({ mode = 'add', initialTask = null, onSubmit, loading, n
       value: date,
       onChange: (_, selectedDate) => selectedDate && setDate(selectedDate),
       mode: currentMode,
-      is24Hour: true,
+      is24Hour: false, 
     });
   };
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]} 
       behavior={Platform.OS === 'ios' ? 'padding' : null}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
     >
+      <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
       <ScrollView style={styles.scrollContainer}>
         <View style={styles.formContainer}>
-          <Text style={styles.title}>{mode === 'edit' ? 'Edit Task' : 'Add New Task'}</Text>
+          <Text style={[styles.title, { color: colors.text }]}>{mode === 'edit' ? 'Edit Task' : 'Add New Task'}</Text>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Title *</Text>
+            <Text style={[styles.label, { color: colors.text }]}>Title *</Text>
             <TextInput
-              style={[styles.input, errors.title && styles.inputError]}
+              style={[styles.input, errors.title && styles.inputError, { color: colors.text, backgroundColor: colors.card }]}
               value={title}
               onChangeText={setTitle}
               placeholder="Enter task title"
+              placeholderTextColor={colors.tabInactive}
             />
             {errors.title && <Text style={styles.errorText}>{errors.title}</Text>}
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Description</Text>
+            <Text style={[styles.label, { color: colors.text }]}>Description</Text>
             <TextInput
-              style={[styles.input, styles.textArea]}
+              style={[styles.input, styles.textArea, { color: colors.text, backgroundColor: colors.card }]}
               value={description}
               onChangeText={setDescription}
               placeholder="Enter description"
               multiline
               numberOfLines={4}
               textAlignVertical="top"
+              placeholderTextColor={colors.tabInactive}
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Date and Time</Text>
-            {Platform.OS === 'web' ? (
-              <WebDateTimePicker value={date} onChange={(_, selected) => selected && setDate(selected)} mode="datetime" />
-            ) : (
-              <SafeAreaView>
-                <Button onPress={() => showMode('date')} title="Pick Date" />
-                <Button onPress={() => showMode('time')} title="Pick Time" />
-                <Text>Selected: {date.toLocaleString()}</Text>
-              </SafeAreaView>
-            )}
+            <Text style={[styles.label, { color: colors.text }]}>Date and Time</Text>
+
+            <SafeAreaView style={styles.datePickerContainer}>
+              <TouchableOpacity
+                onPress={() => showMode('date')}
+                style={[styles.dateTimeButton, { backgroundColor: colors.card }]}
+              >
+                <Text style={[styles.dateTimeButtonText, { color: colors.text }]}>Pick Date</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => showMode('time')}
+                style={[styles.dateTimeButton, { backgroundColor: colors.card }]}
+              >
+                <Text style={[styles.dateTimeButtonText, { color: colors.text }]}>Pick Time</Text>
+              </TouchableOpacity>
+
+              <Text style={[styles.selectedDate, { color: colors.text }]}>
+                Selected: {date.toLocaleString()}
+              </Text>
+            </SafeAreaView>
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Location</Text>
+            <Text style={[styles.label, { color: colors.text }]}>Location</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { color: colors.text, backgroundColor: colors.card }]}
               value={location}
               onChangeText={setLocation}
               placeholder="Enter location"
+              placeholderTextColor={colors.tabInactive}
             />
           </View>
 
-          <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: colors.accent }]}
+            onPress={handleSubmit}
+            disabled={loading}
+          >
             {loading ? <ActivityIndicator color="white" /> : <Text style={styles.buttonText}>{mode === 'edit' ? 'Update Task' : 'Create Task'}</Text>}
           </TouchableOpacity>
         </View>
@@ -130,14 +139,13 @@ const TaskFormScreen = ({ mode = 'add', initialTask = null, onSubmit, loading, n
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1 },
   scrollContainer: { flex: 1 },
   formContainer: { padding: 20 },
   title: { fontSize: 28, fontWeight: 'bold', marginBottom: 20 },
   inputGroup: { marginBottom: 20 },
   label: { fontSize: 16, fontWeight: '600', marginBottom: 8 },
   input: {
-    backgroundColor: 'white',
     padding: 15,
     borderRadius: 8,
     borderWidth: 1,
@@ -148,12 +156,24 @@ const styles = StyleSheet.create({
   textArea: { minHeight: 100, textAlignVertical: 'top' },
   errorText: { color: '#e74c3c', fontSize: 14, marginTop: 5 },
   button: {
-    backgroundColor: '#007AFF',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
   },
   buttonText: { color: 'white', fontSize: 18, fontWeight: '600' },
+  dateTimeButton: {
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginBottom: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dateTimeButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  datePickerContainer: { marginTop: 10 },
+  selectedDate: { marginTop: 10, fontSize: 14 },
 });
 
 export default TaskFormScreen;

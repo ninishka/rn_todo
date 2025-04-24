@@ -4,8 +4,8 @@ import { TaskStatus } from '../utils/taskModel';
 import { useTheme } from '../utils/themeContext';
 
 const TaskCard = ({ task, onPress, onStatusChange, onDelete, showActions = false }) => {
-  const { colors } = useTheme();
-  
+  const { colors, theme } = useTheme();
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleString();
@@ -26,57 +26,51 @@ const TaskCard = ({ task, onPress, onStatusChange, onDelete, showActions = false
     }
   };
 
+  const statusOptions = [
+    { label: 'In Progress', value: TaskStatus.IN_PROGRESS, color: '#f39c12' },
+    { label: 'Complete', value: TaskStatus.COMPLETED, color: '#2ecc71' },
+    { label: 'Cancel', value: TaskStatus.CANCELLED, color: '#e74c3c' },
+  ];
+
   return (
     <TouchableOpacity onPress={() => onPress(task)} style={styles.container}>
-      <View style={[styles.card, { backgroundColor: colors.card }]}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
-          {task.title}
+      <View style={[
+            styles.card,
+            {
+              backgroundColor: colors.card,
+              borderColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+            },
+        ]}>
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
+            {task.title}
+          </Text>
+        </View>
+
+        <Text style={[styles.date, { color: colors.tabInactive }]}>
+          {formatDate(task.dateTime)}
         </Text>
-      </View>
 
-      <Text style={[styles.date, { color: colors.tabInactive }]}>{formatDate(task.dateTime)}</Text>
-
-      <View style={[styles.statusBadge, { backgroundColor: getStatusColor(task.status) }]}>
-        <Text style={styles.statusText}>{task.status}</Text>
-      </View>
-
-        {showActions && (
-          <View style={styles.actions}>
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: '#3498db' }]}
-              onPress={() => onStatusChange(task.id, TaskStatus.IN_PROGRESS)}
-            >
-              <Text style={styles.buttonText}>In Progress</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: '#2ecc71' }]}
-              onPress={() => onStatusChange(task.id, TaskStatus.COMPLETED)}
-            >
-              <Text style={styles.buttonText}>Complete</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: '#e74c3c' }]}
-              onPress={() => onStatusChange(task.id, TaskStatus.CANCELLED)}
-            >
-              <Text style={styles.buttonText}>Cancel</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: '#777' }]}
-              onPress={() => onDelete(task.id)}
-            >
-              <Text style={styles.buttonText}>Delete</Text>
-            </TouchableOpacity>
+        {!showActions && (
+          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(task.status) }]}>
+            <Text style={styles.statusText}>{task.status}</Text>
           </View>
         )}
 
-        {!showActions && (
-          <View style={styles.actionsSimple}>
+        {showActions && (
+          <View style={styles.actionsGroup}>
+            {statusOptions.map((option) => (
+              <TouchableOpacity
+                key={option.value}
+                style={[styles.actionButton, { backgroundColor: option.color }]}
+                onPress={() => onStatusChange(task.id, option.value)}
+              >
+                <Text style={styles.buttonText}>{option.label}</Text>
+              </TouchableOpacity>
+            ))}
+
             <TouchableOpacity
-              style={[styles.buttonDelete, { backgroundColor: '#e74c3c' }]}
+              style={[styles.actionButton, styles.deleteButton]}
               onPress={() => onDelete(task.id)}
             >
               <Text style={styles.buttonText}>Delete</Text>
@@ -90,84 +84,65 @@ const TaskCard = ({ task, onPress, onStatusChange, onDelete, showActions = false
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    marginBottom: 12,
     elevation: 2,
   },
   card: {
-    borderRadius: 8,
-    padding: 15,
+    borderRadius: 15,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    borderWidth: 4,
+    borderColor: 'rgba(0,0,0,0.05)',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
-    flex: 1,
+    fontWeight: '600',
   },
-  statusIndicator: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginLeft: 8,
+  date: {
+    fontSize: 14,
+    marginBottom: 8,
   },
   statusBadge: {
     alignSelf: 'flex-start',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
-    marginBottom: 10,
-    marginTop: 4,
+    marginBottom: 12,
   },
   statusText: {
     color: 'white',
     fontWeight: '600',
-    fontSize: 14,
+    fontSize: 13,
   },
-  date: {
-    fontSize: 14,
-    marginBottom: 5,
+  actionsGroup: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 8,
+    marginTop: 10,
   },
-  status: {
-    fontSize: 14,
-    fontWeight: '500',
+  actionButton: {
+    flexGrow: 1,
+    flexBasis: '30%',
+    paddingVertical: 10,
+    borderRadius: 15,
+    alignItems: 'center',
     marginBottom: 10,
   },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
-  },
-  actionsSimple: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-  button: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 4,
-    marginRight: 5,
-    marginBottom: 5,
-    minWidth: '22%',
-  },
-  buttonDelete: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 4,
+  deleteButton: {
+    backgroundColor: '#d63031',
   },
   buttonText: {
     color: 'white',
-    fontSize: 12,
-    fontWeight: '500',
-    textAlign: 'center',
+    fontWeight: '600',
+    fontSize: 14,
   },
 });
 
-export default TaskCard; 
+export default TaskCard;

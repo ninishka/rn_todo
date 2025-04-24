@@ -4,11 +4,11 @@
     "slug": "rn_todo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/self-improvement.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/self-improvement.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,13 +17,13 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/self-improvement.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.nini_rp.rn_todo"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/self-improvement.png"
     },
     "plugins": [
       "expo-font"

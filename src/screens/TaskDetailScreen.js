@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  StyleSheet,
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  StyleSheet,
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,11 +15,13 @@ import { TaskStatus } from '../utils/taskModel';
 import { showAlert } from '../utils/webUtils';
 import TaskCard from '../components/TaskCard';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTheme } from '../utils/themeContext';
 
 const TaskDetailScreen = ({ route, navigation }) => {
   const { taskId } = route.params;
   const { tasks, loading, changeTaskStatus, removeTask, refreshTasks } = useTasks();
   const [task, setTask] = useState(null);
+  const { theme, colors } = useTheme();
 
   useFocusEffect(
     useCallback(() => {
@@ -37,13 +39,13 @@ const TaskDetailScreen = ({ route, navigation }) => {
           onPress={() => navigation.navigate('EditTask', { taskId })}
           style={{ marginRight: 15 }}
         >
-          <Ionicons name="create-outline" size={24} color="#007AFF" />
+          <Ionicons name="create-outline" size={24} color={colors.primary || '#007AFF'} />
         </TouchableOpacity>
       ),
     });
   }, [taskId, tasks, navigation]);
 
-  const formatDate = dateString => {
+  const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleString();
   };
@@ -66,31 +68,44 @@ const TaskDetailScreen = ({ route, navigation }) => {
         style: 'destructive',
       },
     ];
-    
+
     if (Platform.OS === 'web') {
       showAlert('Delete Task', 'Are you sure you want to delete this task?', alertButtons);
     } else {
-      Alert.alert(
-        'Delete Task',
-        'Are you sure you want to delete this task?',
-        alertButtons
-      );
+      Alert.alert('Delete Task', 'Are you sure you want to delete this task?', alertButtons);
     }
   };
 
   if (loading || !task) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color={colors.primary || '#007AFF'} />
       </View>
     );
   }
 
+  const dynamicCardStyle = {
+    backgroundColor: colors.card,
+    borderColor: theme === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)',
+    borderWidth: 4,
+    shadowColor: theme === 'dark' ? '#000' : '#999',
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 4,
+  };
+
+  const dynamicSectionStyle = {
+    backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+    borderColor: theme === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.05)',
+    borderWidth: 4,
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.card}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.card, dynamicCardStyle]}>
         <View style={styles.header}>
-          <Text style={styles.title}>{task.title}</Text>
+          <Text style={[styles.title, { color: colors.text }]}>{task.title}</Text>
           <View
             style={[
               styles.statusBadge,
@@ -110,33 +125,37 @@ const TaskDetailScreen = ({ route, navigation }) => {
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Description</Text>
-          <Text style={styles.description}>{task.description || 'No description provided'}</Text>
+        <View style={[styles.section, dynamicSectionStyle]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Description</Text>
+          <Text style={[styles.description, { color: colors.text }]}>
+            {task.description || 'No description provided'}
+          </Text>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Date and Time</Text>
-          <Text style={styles.detailText}>{formatDate(task.dateTime)}</Text>
+        <View style={[styles.section, dynamicSectionStyle]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Date and Time</Text>
+          <Text style={[styles.detailText, { color: colors.text }]}>{formatDate(task.dateTime)}</Text>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Location</Text>
-          <Text style={styles.detailText}>{task.location || 'No location set'}</Text>
+        <View style={[styles.section, dynamicSectionStyle]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Location</Text>
+          <Text style={[styles.detailText, { color: colors.text }]}>
+            {task.location || 'No location set'}
+          </Text>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Created At</Text>
-          <Text style={styles.detailText}>{formatDate(task.createdAt)}</Text>
+        <View style={[styles.section, dynamicSectionStyle]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Created At</Text>
+          <Text style={[styles.detailText, { color: colors.text }]}>{formatDate(task.createdAt)}</Text>
         </View>
 
         <View style={styles.actionsContainer}>
-          <Text style={styles.sectionTitle}>Change Status</Text>
-          <TaskCard 
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Change Status</Text>
+          <TaskCard
             task={task}
-            onPress={() => {}} 
+            onPress={() => {}}
             onStatusChange={handleStatusChange}
-            onDelete={() => handleDelete()}
+            onDelete={handleDelete}
             showActions={true}
           />
         </View>
@@ -148,8 +167,6 @@ const TaskDetailScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5', 
-    backgroundImage: 'linear-gradient(120deg, #f0f8ff, #e6f2ff)',
   },
   centered: {
     flex: 1,
@@ -157,17 +174,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   card: {
-    backgroundColor: 'white',
     borderRadius: 15,
     margin: 16,
     padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.05)',
   },
   header: {
     marginBottom: 20,
@@ -176,7 +185,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 8,
-    color: '#2c3e50',
   },
   statusBadge: {
     alignSelf: 'flex-start',
@@ -192,73 +200,24 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 20,
-    backgroundColor: 'rgba(255,255,255,0.8)',
     padding: 12,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.03)',
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#555',
     marginBottom: 8,
   },
   description: {
     fontSize: 16,
     lineHeight: 24,
-    color: '#333',
   },
   detailText: {
     fontSize: 16,
-    color: '#333',
   },
   actionsContainer: {
     marginVertical: 10,
   },
-  actionButtons: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 8,
-    justifyContent: 'space-between',
-  },
-  actionButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    marginRight: 8,
-    marginBottom: 10,
-    minWidth: '45%',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  actionButtonText: {
-    color: 'white',
-    fontWeight: '600',
-  },
-  deleteButton: {
-    backgroundColor: '#e74c3c',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: 10,
-    marginTop: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  deleteButtonText: {
-    color: 'white',
-    fontWeight: '600',
-    marginLeft: 8,
-  },
 });
 
-export default TaskDetailScreen; 
+export default TaskDetailScreen;
