@@ -21,8 +21,8 @@ A React Native mobile application for managing tasks with features to create, vi
 
 1. Clone the repository:
 ```
-git clone <repository-url>
-cd task-manager-app
+git clone git@github.com:ninishka/rn_todo.git
+cd rn_todo
 ```
 
 2. Install dependencies:
@@ -32,7 +32,7 @@ npm install
 
 3. Start the Expo development server:
 ```
-npm start
+npx expo start
 ```
 
 4. Run on a device or emulator:
@@ -76,7 +76,3 @@ src/
 4. **Edit Task Screen**
    - Modify any task details
    - Similar to add task screen but pre-filled with existing data
-
-## License
-
-MIT 

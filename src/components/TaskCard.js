@@ -3,7 +3,6 @@ import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { TaskStatus } from '../utils/taskModel';
 import { useTheme } from '../utils/themeContext';
 
-// Component to display a task card in the list
 const TaskCard = ({ task, onPress, onStatusChange, onDelete, showActions = false }) => {
   const { colors } = useTheme();
   
@@ -15,15 +14,15 @@ const TaskCard = ({ task, onPress, onStatusChange, onDelete, showActions = false
   const getStatusColor = (status) => {
     switch (status) {
       case TaskStatus.TODO:
-        return '#3498db'; // Blue
+        return '#3498db';
       case TaskStatus.IN_PROGRESS:
-        return '#f39c12'; // Orange
+        return '#f39c12';
       case TaskStatus.COMPLETED:
-        return '#2ecc71'; // Green
+        return '#2ecc71';
       case TaskStatus.CANCELLED:
-        return '#e74c3c'; // Red
+        return '#e74c3c';
       default:
-        return '#95a5a6'; // Gray
+        return '#95a5a6';
     }
   };
 

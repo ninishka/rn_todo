@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -14,11 +14,18 @@ import useTasks from '../hooks/useTasks';
 import { TaskStatus } from '../utils/taskModel';
 import { showAlert } from '../utils/webUtils';
 import TaskCard from '../components/TaskCard';
+import { useFocusEffect } from '@react-navigation/native';
 
 const TaskDetailScreen = ({ route, navigation }) => {
   const { taskId } = route.params;
-  const { tasks, loading, changeTaskStatus, removeTask } = useTasks();
+  const { tasks, loading, changeTaskStatus, removeTask, refreshTasks } = useTasks();
   const [task, setTask] = useState(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshTasks();
+    }, [])
+  );
 
   useEffect(() => {
     const foundTask = tasks.find((t) => t.id === taskId);
@@ -36,7 +43,7 @@ const TaskDetailScreen = ({ route, navigation }) => {
     });
   }, [taskId, tasks, navigation]);
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     const date = new Date(dateString);
     return date.toLocaleString();
   };
@@ -82,7 +89,6 @@ const TaskDetailScreen = ({ route, navigation }) => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.card}>
-        {/* Task Header */}
         <View style={styles.header}>
           <Text style={styles.title}>{task.title}</Text>
           <View
@@ -124,7 +130,6 @@ const TaskDetailScreen = ({ route, navigation }) => {
           <Text style={styles.detailText}>{formatDate(task.createdAt)}</Text>
         </View>
 
-        {/* Task Actions */}
         <View style={styles.actionsContainer}>
           <Text style={styles.sectionTitle}>Change Status</Text>
           <TaskCard 

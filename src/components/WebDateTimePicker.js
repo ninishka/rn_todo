@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, Platform } from 'react-native';
 
 const WebDateTimePicker = ({ value, onChange, mode = 'datetime' }) => {
   if (Platform.OS !== 'web') {
@@ -12,25 +12,10 @@ const WebDateTimePicker = ({ value, onChange, mode = 'datetime' }) => {
   }
 
   const handleChange = (e) => {
-    const localDate = new Date(e.target.value); // Local time input
+    const localDate = new Date(e.target.value);
     if (!isNaN(localDate)) {
       const utcISOString = localDate.toISOString(); 
       onChange({ nativeEvent: { timestamp: localDate.getTime() } }, utcISOString);
-    }
-  };
-
-  const formatDateForInput = () => {
-    if (!value) return '';
-
-    const date = new Date(value);
-    if (isNaN(date)) return '';
-
-    if (mode === 'date') {
-      return date.toISOString().split('T')[0];
-    } else if (mode === 'time') {
-      return date.toISOString().split('T')[1].slice(0, 5);
-    } else {
-      return date.toISOString().slice(0, 16);
     }
   };
 

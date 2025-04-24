@@ -10,7 +10,6 @@ import { TaskStatus } from '../utils/taskModel';
 // Remove a task
 // Sort tasks by creation date or status
 
-
 export default function useTasks() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);

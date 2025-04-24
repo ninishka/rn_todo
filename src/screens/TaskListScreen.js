@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -8,57 +8,14 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
-  ImageBackground,
   StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import TaskCard from '../components/TaskCard';
 import useTasks from '../hooks/useTasks';
-import { TaskStatus } from '../utils/taskModel';
 import { showAlert } from '../utils/webUtils';
 import { useTheme } from '../utils/themeContext';
 import { useFocusEffect } from '@react-navigation/native';
-import { useCallback } from 'react';
-
-//// Theme colors
-const themes = {
-  light: {
-    background: '#f5f5f5',
-    backgroundGradient: 'linear-gradient(135deg, #f5f5f5, #e0e0e0)',
-    card: 'white',
-    text: '#333333',
-    headerBg: 'white',
-    accent: '#007AFF',
-    tabInactive: '#888888',
-  },
-  dark: {
-    background: '#121212',
-    backgroundGradient: 'linear-gradient(135deg, #121212, #2d2d2d)',
-    card: '#1e1e1e',
-    text: '#ffffff',
-    headerBg: '#1e1e1e',
-    accent: '#0a84ff',
-    tabInactive: '#888888',
-  },
-  blue: {
-    background: '#e6f2ff',
-    backgroundGradient: 'linear-gradient(135deg, #e6f2ff, #c5e1ff)',
-    card: 'white',
-    text: '#333333',
-    headerBg: '#f0f8ff',
-    accent: '#007AFF',
-    tabInactive: '#888888',
-  },
-  purple: {
-    background: '#f0e7ff',
-    backgroundGradient: 'linear-gradient(135deg, #f0e7ff, #d8c2ff)',
-    card: 'white',
-    text: '#333333',
-    headerBg: '#f8f0ff',
-    accent: '#8a3df9',
-    tabInactive: '#888888',
-  },
-};
 
 const TaskListScreen = ({ navigation }) => {
   const {
@@ -74,9 +31,6 @@ const TaskListScreen = ({ navigation }) => {
   const [sortBy, setSortBy] = useState('date');
   const { theme, colors, toggleTheme } = useTheme();
 
-
-
-  //need to dig this one, was hard to figure out //
   useFocusEffect(
     useCallback(() => {
       refreshTasks();
@@ -126,7 +80,6 @@ const TaskListScreen = ({ navigation }) => {
     </View>
   );
 
-  // Handle errors
   if (error) {
     return (
       <View style={[styles.centered, {backgroundColor: colors.background}]}>
@@ -138,7 +91,6 @@ const TaskListScreen = ({ navigation }) => {
     );
   }
 
-  // Set background style based on theme
   const backgroundStyle = Platform.OS === 'web' 
     ? { backgroundColor: colors.background, backgroundImage: colors.backgroundGradient }
     : { backgroundColor: colors.background };
@@ -147,7 +99,6 @@ const TaskListScreen = ({ navigation }) => {
     <View style={[styles.container, backgroundStyle]}>
       <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
       
-      {/* Header */}
       <View style={[styles.header, {backgroundColor: colors.headerBg}]}>
         <View style={styles.headerRow}>
           <Text style={[styles.title, {color: colors.text}]}>My Tasks</Text>
@@ -214,7 +165,7 @@ const TaskListScreen = ({ navigation }) => {
               onPress={handleViewTask}
               onStatusChange={handleStatusChange}
               onDelete={handleDeleteTask}
-              showActions={false} // Don't show action buttons on main list
+              showActions={false}
             />
           )}
           contentContainerStyle={styles.listContainer}
