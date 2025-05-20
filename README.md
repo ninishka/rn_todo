@@ -1,3 +1,4 @@
+You need to have apk file to see the app
 # Task Manager Mobile App
 
 A React Native mobile application for managing tasks with features to create, view, edit, and track the status of tasks.
